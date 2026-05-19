@@ -5,3 +5,4 @@ PyPDF2
 python-multipart
 Jinja2
 reportlab
+PyMuPDF
