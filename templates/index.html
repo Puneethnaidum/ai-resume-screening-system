@@ -5,17 +5,12 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>AI Resume Screening System</title>
 
-    <link
-        rel="stylesheet"
-        href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css">
 
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
@@ -24,30 +19,11 @@
 
     <div class="container">
 
-        <!-- ========================= -->
-        <!-- HEADER -->
-        <!-- ========================= -->
+        <h1 class="main-title">AI Resume Screening System</h1>
 
-        <div class="header-section">
+        <div class="upload-card">
 
-            <h1>AI Resume Screening System</h1>
-
-            <p>
-                Upload resumes and compare them against job descriptions using AI and NLP.
-            </p>
-
-        </div>
-
-        <!-- ========================= -->
-        <!-- FORM -->
-        <!-- ========================= -->
-
-        <div class="form-card">
-
-            <form
-                action="/match-resume/"
-                method="post"
-                enctype="multipart/form-data">
+            <form action="/match-resume/" method="post" enctype="multipart/form-data">
 
                 <label>Job Description</label>
 
@@ -58,533 +34,398 @@
 
                 <label>Upload Resumes</label>
 
+                <label for="resumeUpload" class="upload-label">
+
+                    <span>📄 Drag & Drop Resumes Here</span>
+
+                    <small>or click to browse files</small>
+
+                </label>
+
                 <input
                     type="file"
+                    id="resumeUpload"
                     name="resumes"
-                    accept=".pdf"
                     multiple
-                    required>
+                    required
+                    hidden>
 
-                <button type="submit">
-                    Analyze Resumes
-                </button>
+                <div class="checkbox-box">
+
+                    <input
+                        type="checkbox"
+                        name="use_gemini"
+                        value="yes">
+
+                    <span>Enable Gemini AI Analysis</span>
+
+                </div>
+
+                <button type="submit">Analyze Resumes</button>
 
             </form>
 
         </div>
 
-        <!-- ========================= -->
-        <!-- ANALYTICS -->
-        <!-- ========================= -->
-
         {% if analytics %}
 
-        <div class="dashboard-section">
+        <div class="analytics-grid">
 
-            <h2>Analytics Dashboard</h2>
+            <div class="analytics-card">
+                <h2>Total Resumes</h2>
+                <p>{{ analytics.total_resumes }}</p>
+            </div>
 
-            <div class="dashboard-grid">
+            <div class="analytics-card">
+                <h2>Highest Score</h2>
+                <p>{{ analytics.highest_score }}%</p>
+            </div>
 
-                <div class="dashboard-card">
-                    <h3>Total Resumes</h3>
-                    <p>{{ analytics.total_resumes }}</p>
-                </div>
+            <div class="analytics-card">
+                <h2>Average Score</h2>
+                <p>{{ analytics.average_score }}%</p>
+            </div>
 
-                <div class="dashboard-card">
-                    <h3>Highest Score</h3>
-                    <p>{{ analytics.highest_score }}%</p>
-                </div>
+            <div class="analytics-card">
+                <h2>Strong Hire</h2>
+                <p>{{ analytics.strong_hire_count }}</p>
+            </div>
 
-                <div class="dashboard-card">
-                    <h3>Average Score</h3>
-                    <p>{{ analytics.average_score }}%</p>
-                </div>
+            <div class="analytics-card">
+                <h2>Moderate Hire</h2>
+                <p>{{ analytics.moderate_hire_count }}</p>
+            </div>
 
-                <div class="dashboard-card">
-                    <h3>Strong Hire</h3>
-                    <p>{{ analytics.strong_hire_count }}</p>
-                </div>
-
-                <div class="dashboard-card">
-                    <h3>Moderate Hire</h3>
-                    <p>{{ analytics.moderate_hire_count }}</p>
-                </div>
-
-                <div class="dashboard-card">
-                    <h3>Low Match</h3>
-                    <p>{{ analytics.low_match_count }}</p>
-                </div>
-
+            <div class="analytics-card">
+                <h2>Low Match</h2>
+                <p>{{ analytics.low_match_count }}</p>
             </div>
 
         </div>
 
-        <!-- ========================= -->
-        <!-- PIE CHART -->
-        <!-- ========================= -->
-
-        <div class="chart-section">
+        <div class="chart-container">
 
             <h2>Hiring Recommendation Distribution</h2>
 
-            <canvas id="recommendationChart"></canvas>
+            <canvas id="pieChart"></canvas>
 
         </div>
 
-        <!-- ========================= -->
-        <!-- BAR CHART -->
-        <!-- ========================= -->
-
-        <div class="chart-section">
+        <div class="chart-container">
 
             <h2>Candidate Match Score Comparison</h2>
 
-            <canvas id="scoreChart"></canvas>
+            <canvas id="barChart"></canvas>
 
         </div>
 
-        <!-- ========================= -->
-        <!-- CHART JS -->
-        <!-- ========================= -->
-
-        <script>
-
-            // =========================
-            // PIE CHART
-            // =========================
-
-            const recommendationCtx =
-                document.getElementById('recommendationChart');
-
-            new Chart(recommendationCtx, {
-
-                type: 'pie',
-
-                data: {
-
-                    labels: [
-                        'Strong Hire',
-                        'Moderate Hire',
-                        'Low Match'
-                    ],
-
-                    datasets: [{
-
-                        data: [
-
-                            {{ analytics.strong_hire_count }},
-                            {{ analytics.moderate_hire_count }},
-                            {{ analytics.low_match_count }}
-
-                        ],
-
-                        backgroundColor: [
-
-                            '#16a34a',
-                            '#f59e0b',
-                            '#dc2626'
-
-                        ]
-
-                    }]
-                },
-
-                options: {
-
-                    responsive: true,
-
-                    maintainAspectRatio: false,
-
-                    plugins: {
-
-                        legend: {
-
-                            labels: {
-
-                                font: {
-
-                                    size: 18
-
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-
-            // =========================
-            // BAR CHART
-            // =========================
-
-            const scoreCtx =
-                document.getElementById('scoreChart');
-
-            new Chart(scoreCtx, {
-
-                type: 'bar',
-
-                data: {
-
-                    labels: [
-
-                        {% for result in results %}
-
-                            "{{ result.resume_name }}",
-
-                        {% endfor %}
-
-                    ],
-
-                    datasets: [{
-
-                        label: 'Match Score (%)',
-
-                        data: [
-
-                            {% for result in results %}
-
-                                {{ result.match_score }},
-
-                            {% endfor %}
-
-                        ],
-
-                        backgroundColor: '#2563eb',
-
-                        borderRadius: 12
-
-                    }]
-                },
-
-                options: {
-
-                    responsive: true,
-
-                    maintainAspectRatio: false,
-
-                    plugins: {
-
-                        legend: {
-
-                            labels: {
-
-                                font: {
-
-                                    size: 18
-
-                                }
-                            }
-                        }
-                    },
-
-                    scales: {
-
-                        x: {
-
-                            ticks: {
-
-                                font: {
-
-                                    size: 16
-
-                                }
-                            }
-                        },
-
-                        y: {
-
-                            beginAtZero: true,
-
-                            max: 100,
-
-                            ticks: {
-
-                                font: {
-
-                                    size: 16
-
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-        </script>
-
         {% endif %}
-
-        <!-- ========================= -->
-        <!-- RESULTS -->
-        <!-- ========================= -->
 
         {% if results %}
 
-        <div class="results-section">
+        <h1 class="ranking-title">Candidate Rankings</h1>
 
-            <h2>Candidate Rankings</h2>
+        {% for result in results %}
 
-            {% for result in results %}
+        <div class="result-card">
 
-            <div class="result-card">
+            <h2>
+                {{ loop.index }}.
+                {{ result.resume_name }}
+            </h2>
 
-                <!-- ========================= -->
-                <!-- TITLE -->
-                <!-- ========================= -->
+            <div class="candidate-info">
 
-                <h2>
-                    {{ loop.index }}.
-                    {{ result.resume_name }}
-                </h2>
+                <p>
+                    <strong>Candidate Name:</strong>
+                    {{ result.candidate_name }}
+                </p>
 
-                <!-- ========================= -->
-                <!-- CANDIDATE INFO -->
-                <!-- ========================= -->
+                <p>
+                    <strong>Email:</strong>
+                    {{ result.email }}
+                </p>
 
-                <div class="candidate-info">
+                <p>
+                    <strong>Phone:</strong>
+                    {{ result.phone }}
+                </p>
 
-                    <p>
-                        <strong>Candidate Name:</strong>
-                        {{ result.candidate_name }}
-                    </p>
+                <p>
+                    <strong>Experience:</strong>
+                    {{ result.experience }}
+                </p>
 
-                    <p>
-                        <strong>Email:</strong>
-                        {{ result.email }}
-                    </p>
+                <p>
+                    <strong>Education Keywords:</strong>
+                    {{ result.education | join(', ') }}
+                </p>
 
-                    <p>
-                        <strong>Phone:</strong>
-                        {{ result.phone }}
-                    </p>
+            </div>
 
-                    <p>
-                        <strong>Experience:</strong>
-                        {{ result.experience }}
-                    </p>
+            <div class="recommendation-box">
 
-                    <p>
-                        <strong>Education Keywords:</strong>
+                <strong>AI Hiring Recommendation:</strong>
 
-                        {% if result.education %}
+                {% if result.hiring_recommendation == "Strong Hire" %}
 
-                            {{ result.education | join(', ') }}
+                <span class="strong-hire">
+                    {{ result.hiring_recommendation }}
+                </span>
 
-                        {% else %}
+                {% elif result.hiring_recommendation == "Moderate Hire" %}
 
-                            Not Found
+                <span class="moderate-hire">
+                    {{ result.hiring_recommendation }}
+                </span>
 
-                        {% endif %}
-                    </p>
+                {% else %}
 
-                </div>
+                <span class="low-match">
+                    {{ result.hiring_recommendation }}
+                </span>
 
-                <!-- ========================= -->
-                <!-- RECOMMENDATION -->
-                <!-- ========================= -->
+                {% endif %}
 
-                <div class="recommendation-box">
+            </div>
 
-                    <strong>
-                        AI Hiring Recommendation:
-                    </strong>
+            <h3>Match Score</h3>
 
-                    {% if result.hiring_recommendation == "Strong Hire" %}
+            <div class="progress-bar">
 
-                        <span class="strong-hire">
-                            {{ result.hiring_recommendation }}
-                        </span>
+                <div
+                    class="progress-fill"
+                    style="width: {{ result.match_score }}%;">
 
-                    {% elif result.hiring_recommendation == "Moderate Hire" %}
-
-                        <span class="moderate-hire">
-                            {{ result.hiring_recommendation }}
-                        </span>
-
-                    {% else %}
-
-                        <span class="low-match">
-                            {{ result.hiring_recommendation }}
-                        </span>
-
-                    {% endif %}
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- MATCH SCORE -->
-                <!-- ========================= -->
-
-                <h3>Match Score</h3>
-
-                <div class="score-bar">
-
-                    <div
-                        class="score-fill"
-                        style="width: {{ result.match_score }}%;">
-
-                        {{ result.match_score }}%
-
-                    </div>
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- MATCHED SKILLS -->
-                <!-- ========================= -->
-
-                <div class="skills-section">
-
-                    <h3>Matched Skills</h3>
-
-                    {% if result.matched_skills %}
-
-                        {% for skill in result.matched_skills %}
-
-                            <span class="skill-tag">
-                                {{ skill }}
-                            </span>
-
-                        {% endfor %}
-
-                    {% else %}
-
-                        <p>No matched skills found.</p>
-
-                    {% endif %}
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- MISSING SKILLS -->
-                <!-- ========================= -->
-
-                <div class="skills-section">
-
-                    <h3>Missing Skills</h3>
-
-                    {% if result.missing_skills %}
-
-                        {% for skill in result.missing_skills %}
-
-                            <span class="missing-tag">
-                                {{ skill }}
-                            </span>
-
-                        {% endfor %}
-
-                    {% else %}
-
-                        <p>No missing skills found.</p>
-
-                    {% endif %}
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- TOP KEYWORDS -->
-                <!-- ========================= -->
-
-                <div class="skills-section">
-
-                    <h3>Top Resume Keywords</h3>
-
-                    {% for keyword in result.top_keywords %}
-
-                        <span class="keyword-tag">
-                            {{ keyword }}
-                        </span>
-
-                    {% endfor %}
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- FEEDBACK -->
-                <!-- ========================= -->
-
-                <div class="feedback-section">
-
-                    <h3>AI Resume Feedback</h3>
-
-                    <ul>
-
-                        {% for feedback in result.feedback %}
-
-                            <li>{{ feedback }}</li>
-
-                        {% endfor %}
-
-                    </ul>
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- IMPROVEMENT -->
-                <!-- ========================= -->
-
-                <div class="feedback-section">
-
-                    <h3>Resume Improvement Suggestions</h3>
-
-                    <ul>
-
-                        {% for suggestion in result.improvement_suggestions %}
-
-                            <li>{{ suggestion }}</li>
-
-                        {% endfor %}
-
-                    </ul>
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- QUESTIONS -->
-                <!-- ========================= -->
-
-                <div class="feedback-section">
-
-                    <h3>Suggested Interview Questions</h3>
-
-                    <ol>
-
-                        {% for question in result.interview_questions %}
-
-                            <li>{{ question }}</li>
-
-                        {% endfor %}
-
-                    </ol>
-
-                </div>
-
-                <!-- ========================= -->
-                <!-- DOWNLOAD REPORT -->
-                <!-- ========================= -->
-
-                <div class="download-section">
-
-                    <a
-                        href="{{ result.report_path }}"
-                        target="_blank">
-
-                        Download PDF Report
-
-                    </a>
+                    {{ result.match_score }}%
 
                 </div>
 
             </div>
 
-            {% endfor %}
+            <h3>Matched Skills</h3>
+
+            <div class="skills-container">
+
+                {% for skill in result.matched_skills %}
+
+                <span class="skill-tag matched">
+                    {{ skill }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+            <h3>Missing Skills</h3>
+
+            <div class="skills-container">
+
+                {% for skill in result.missing_skills %}
+
+                <span class="skill-tag missing">
+                    {{ skill }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+            <h3>Top Resume Keywords</h3>
+
+            <div class="skills-container">
+
+                {% for keyword in result.top_keywords %}
+
+                <span class="skill-tag keyword">
+                    {{ keyword }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="feedback-box">
+
+                <h2>AI Resume Feedback</h2>
+
+                <ul>
+
+                    {% for feedback in result.feedback %}
+
+                    <li>{{ feedback }}</li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <div class="improvement-box">
+
+                <h2>Resume Improvement Suggestions</h2>
+
+                <ul>
+
+                    {% for suggestion in result.improvement_suggestions %}
+
+                    <li>{{ suggestion }}</li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <div class="ai-analysis-box">
+
+                <h2>Gemini AI Resume Analysis</h2>
+
+                <pre>{{ result.ai_resume_analysis }}</pre>
+
+            </div>
+
+            <div class="questions-box">
+
+                <h2>Suggested Interview Questions</h2>
+
+                <ol>
+
+                    {% for question in result.interview_questions %}
+
+                    <li>{{ question }}</li>
+
+                    {% endfor %}
+
+                </ol>
+
+            </div>
+
+            <a
+                href="{{ result.report_path }}"
+                target="_blank"
+                class="download-btn">
+
+                Download PDF Report
+
+            </a>
 
         </div>
+
+        {% endfor %}
 
         {% endif %}
 
     </div>
+
+    {% if analytics %}
+
+    <script>
+
+        const pieCtx = document.getElementById('pieChart');
+
+        new Chart(pieCtx, {
+
+            type: 'pie',
+
+            data: {
+
+                labels: [
+                    'Strong Hire',
+                    'Moderate Hire',
+                    'Low Match'
+                ],
+
+                datasets: [{
+
+                    data: [
+                        {{ analytics.strong_hire_count }},
+                        {{ analytics.moderate_hire_count }},
+                        {{ analytics.low_match_count }}
+                    ],
+
+                    backgroundColor: [
+                        '#16a34a',
+                        '#f59e0b',
+                        '#dc2626'
+                    ]
+
+                }]
+            }
+        });
+
+        const barCtx = document.getElementById('barChart');
+
+        new Chart(barCtx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: [
+
+                    {% for result in results %}
+
+                    "{{ result.resume_name }}",
+
+                    {% endfor %}
+
+                ],
+
+                datasets: [{
+
+                    label: 'Match Score (%)',
+
+                    data: [
+
+                        {% for result in results %}
+
+                        {{ result.match_score }},
+
+                        {% endfor %}
+
+                    ],
+
+                    backgroundColor: '#2563eb'
+
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100
+
+                    }
+                }
+            }
+        });
+
+        const resumeUpload = document.getElementById("resumeUpload");
+
+        const uploadLabel = document.querySelector(".upload-label");
+
+        resumeUpload.addEventListener("change", function () {
+
+            if (resumeUpload.files.length > 0) {
+
+                uploadLabel.innerHTML = `
+                    <span>✅ ${resumeUpload.files.length} file(s) selected</span>
+                    <small>Click again to change files</small>
+                `;
+            }
+        });
+
+    </script>
+
+    {% endif %}
 
 </body>
 
